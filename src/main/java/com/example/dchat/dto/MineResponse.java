@@ -1,6 +1,6 @@
-package com.example.dchat.model.response;
+package com.example.dchat.dto;
 
-import com.example.dchat.model.Transaction;
+import com.example.dchat.blockchain.Transaction;
 import lombok.Builder;
 import lombok.Data;
 
