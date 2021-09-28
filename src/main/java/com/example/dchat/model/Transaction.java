@@ -1,4 +1,4 @@
-package com.example.dchat.blockchain;
+package com.example.dchat.model;
 
 import lombok.Builder;
 import lombok.Value;
