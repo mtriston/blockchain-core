@@ -20,7 +20,10 @@ public class BlockchainServiceImpl implements BlockchainService {
     private final TransactionService transactionService;
 
     private Block createBlock() {
-        List<Transaction> transactions = transactionService.getTransactions(20);
+        //TODO: подумать над созданием блока без транзакций
+        //TODO: добавить в блок транзакцию с вознаграждением
+        List<Transaction> transactions = transactionService.getTransactions();
+        transactions = transactions.subList(0, Math.min(transactions.size(), 20));
         Block lastBlock = chainRepository.getLastBlock();
         return new Block(lastBlock.getIndex() + 1, transactions, lastBlock.getHash());
     }

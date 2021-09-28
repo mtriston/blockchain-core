@@ -5,9 +5,12 @@ import com.example.dchat.model.Transaction;
 import java.util.List;
 
 public interface TransactionRepository {
+
+    List<Transaction> getTransactions();
+
     void addTransaction(Transaction transaction);
 
     void removeTransactions(List<Transaction> transactions);
 
-    List<Transaction> getTransactions(int n);
+    boolean isContains(Transaction transaction);
 }

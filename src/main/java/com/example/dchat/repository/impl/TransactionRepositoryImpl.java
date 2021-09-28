@@ -13,6 +13,11 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     private final List<Transaction> pendingTransactions = Collections.synchronizedList(new ArrayList<>());
 
     @Override
+    public List<Transaction> getTransactions() {
+        return pendingTransactions;
+    }
+
+    @Override
     public void addTransaction(Transaction transaction) {
         pendingTransactions.add(transaction);
     }
@@ -23,7 +28,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
-    public List<Transaction> getTransactions(int n) {
-        return pendingTransactions.subList(0, n);
+    public boolean isContains(Transaction transaction) {
+        return pendingTransactions.contains(transaction);
     }
 }

@@ -1,17 +1,23 @@
 package com.example.dchat.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 import java.util.Objects;
 
 @Data
-@AllArgsConstructor
+@NoArgsConstructor
 public class Peer {
     private String ip;
     private int port;
     Date lastSeen;
+
+    public Peer(String address) {
+        this.ip = address.split(":")[0];
+        this.port = Integer.parseInt(address.split(":")[1]);
+        this.lastSeen = new Date(System.currentTimeMillis());
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -24,5 +30,10 @@ public class Peer {
     @Override
     public int hashCode() {
         return Objects.hash(ip, port);
+    }
+
+    @Override
+    public String toString() {
+        return ip + ":" + port;
     }
 }

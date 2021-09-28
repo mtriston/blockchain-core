@@ -26,43 +26,52 @@ public class BlockchainController {
 
     @PostMapping("/transaction")
     public void postTransaction(@RequestBody TransactionDto transactionDto) {
-        //TODO: обновить last seen отправителю
+        Peer sender = new Peer(transactionDto.getMeta().getSenderAddress());
+
         Transaction transaction = transactionDto.getTransaction();
-        if (transactionService.isValidTransaction(transaction) && transactionService.isUniqueTransaction(transaction)) {
+        if (transactionService.isValidTransaction(transaction) && transactionService.isContains(transaction)) {
             transactionService.addTransaction(transaction);
-            //TODO: разослать транзакцию другим
+            peerService.broadcastTransaction(transaction);
         }
+        peerService.addPeers(List.of(sender));
     }
 
     @PostMapping("/block")
     public void postBlock(@RequestBody BlockDto blockDto) {
-        //TODO: обновить last seen отправителю
+        Peer sender = new Peer(blockDto.getMeta().getSenderAddress());
+
         Block block = blockDto.getBlock();
         if (blockchainService.isValidBlock(block) && blockchainService.isContains(block)) {
             blockchainService.addBlock(block);
-            //TODO: разослать блок другим
+            peerService.broadcastBlock(block);
         }
+        peerService.addPeers(List.of(sender));
     }
 
     @PostMapping("/peer")
     public void postPeerList(@RequestBody PeerListDto peerList) {
-        //TODO: обновить last seen отправителю
+        Peer sender = new Peer(peerList.getMeta().getSenderAddress());
+
         List<Peer> peers = peerList.getPeerList();
+        int chainLength = blockchainService.getChain().size();
         for (Peer peer : peers) {
-            //TODO: пингануть всех
+            peerService.sendPing(peer, chainLength);
         }
         peerService.addPeers(peers);
+        peerService.addPeers(List.of(sender));
     }
 
     @PostMapping("/ping")
     public void postPing(@RequestBody PingDto pingDto) {
-        //TODO: отправить свои контакты отправителю пинга
+        Peer sender = new Peer(pingDto.getMeta().getSenderAddress());
+
         int otherChainLength = pingDto.getChainHeight();
         List<Block> myChain = blockchainService.getChain();
         if (myChain.size() > otherChainLength) {
             for (int i = otherChainLength; i < myChain.size(); ++i) {
-                //TODO: отправить блок отправителю пинга
+                peerService.sendBlock(sender, myChain.get(i));
             }
         }
+        peerService.addPeers(List.of(sender));
     }
 }

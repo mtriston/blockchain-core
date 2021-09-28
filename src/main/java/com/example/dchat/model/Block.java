@@ -1,6 +1,7 @@
 package com.example.dchat.model;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.java.Log;
 
 import java.nio.charset.StandardCharsets;
@@ -12,6 +13,7 @@ import java.util.logging.Level;
 
 @Log
 @Data
+@NoArgsConstructor
 public class Block {
     private int index;
     private String hash;
