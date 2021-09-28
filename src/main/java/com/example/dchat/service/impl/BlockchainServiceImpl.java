@@ -25,7 +25,8 @@ public class BlockchainServiceImpl implements BlockchainService {
         return new Block(lastBlock.getIndex() + 1, transactions, lastBlock.getHash());
     }
 
-    private Block addBlock(Block block) {
+    @Override
+    public Block addBlock(Block block) {
         transactionService.removeTransactions(block.getTransactions());
         chainRepository.saveBlock(block);
         return block;
@@ -34,6 +35,22 @@ public class BlockchainServiceImpl implements BlockchainService {
     @Override
     public List<Block> getChain() {
         return chainRepository.getChain();
+    }
+
+    @Override
+    public boolean isValidBlock(Block block) {
+        List<Transaction> transactions = block.getTransactions();
+        for (Transaction transaction : transactions) {
+            if (!transactionService.isValidTransaction(transaction))
+                return false;
+        }
+        return Block.calculateBlockHash(block).equals(block.getHash()) &&
+                    chainRepository.getLastBlock().getHash().equals(block.getPreviousHash());
+    }
+
+    @Override
+    public boolean isContains(Block block) {
+        return chainRepository.isContains(block);
     }
 
     @Override

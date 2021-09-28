@@ -11,4 +11,5 @@ public interface ChainRepository {
     Block getLastBlock();
     List<Block> getChain();
     int getChainHeight();
+    boolean isContains(Block block);
 }

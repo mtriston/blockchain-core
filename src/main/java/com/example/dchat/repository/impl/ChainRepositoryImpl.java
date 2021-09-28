@@ -42,4 +42,9 @@ public class ChainRepositoryImpl implements ChainRepository {
     public int getChainHeight() {
         return blockchain.size();
     }
+
+    @Override
+    public boolean isContains(Block block) {
+        return blockchain.contains(block);
+    }
 }
