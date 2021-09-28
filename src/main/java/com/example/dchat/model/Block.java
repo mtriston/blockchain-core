@@ -26,15 +26,15 @@ public class Block {
         this.previousHash = previousHash;
         this.timeStamp = System.currentTimeMillis() / 1000;
         this.nonce = new Random().nextInt();
-        this.hash = calculateBlockHash();
+        this.hash = calculateBlockHash(this);
     }
 
-    private String calculateBlockHash() {
-        String dataToHash = previousHash
-                + index
-                + timeStamp
-                + nonce
-                + transactions;
+    public static String calculateBlockHash(Block block) {
+        String dataToHash = block.previousHash
+                + block.index
+                + block.timeStamp
+                + block.nonce
+                + block.transactions;
         MessageDigest digest = null;
         try {
             digest = MessageDigest.getInstance("SHA-256");
