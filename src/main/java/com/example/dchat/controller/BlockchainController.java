@@ -65,6 +65,8 @@ public class BlockchainController {
     public void postPing(@RequestBody PingDto pingDto) {
         Peer sender = new Peer(pingDto.getMeta().getSenderAddress());
 
+        peerService.shareContactsWith(sender);
+
         int otherChainLength = pingDto.getChainHeight();
         List<Block> myChain = blockchainService.getChain();
         if (myChain.size() > otherChainLength) {
