@@ -17,7 +17,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public boolean isValidTransaction(Transaction transaction) {
         return true;
-        //TODO: реализовать проверку подписи
+        //TODO: реализовать проверку подписи // jasypt or JKS
     }
 
     @Override

@@ -39,6 +39,7 @@ public class PeerServiceImpl implements PeerService {
 
     @Override
     public void broadcastBlock(Block block) {
+        // Mb first we send block hash and then -> block (not sure) -> to minimize traffic
         List<Peer> peers = peerRepository.getActivityPeers();
         for (Peer peer : peers) {
             sendBlock(peer, block);
@@ -55,7 +56,9 @@ public class PeerServiceImpl implements PeerService {
     }
 
     @Override
-    public void broadcastTransaction(Transaction transaction) {
+    public void broadcastTransaction(Transaction transaction) { // 1. Mb with transaction service?
+        // in this method we should first send transaction hash (to minimize traffic)
+        // If the recipient doesn't have this transaction -> then we send it to him
         List<Peer> peers = peerRepository.getActivityPeers();
         for (Peer peer : peers) {
             sendTransaction(peer, transaction);

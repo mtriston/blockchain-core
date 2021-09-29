@@ -62,7 +62,7 @@ public class BlockchainController {
         peerService.addPeers(List.of(sender));
     }
 
-    @PostMapping("/ping")
+    @PostMapping("/ping") // what does this name mean? new person registration?
     public void postPing(@RequestBody PingDto pingDto) {
         Peer sender = new Peer(pingDto.getMeta().getSenderAddress());
 
