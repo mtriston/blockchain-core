@@ -11,12 +11,14 @@ import com.example.dchat.service.BlockchainService;
 import com.example.dchat.service.PeerService;
 import com.example.dchat.service.TransactionService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@Log4j2
 @RestController
 @RequiredArgsConstructor
 public class BlockchainController {
@@ -26,6 +28,7 @@ public class BlockchainController {
 
     @PostMapping("/transaction")
     public void postTransaction(@RequestBody TransactionDto transactionDto) {
+        log.debug("received transaction: " + transactionDto);
         Peer sender = new Peer(transactionDto.getMeta().getSenderAddress());
 
         Transaction transaction = transactionDto.getTransaction();
@@ -38,6 +41,7 @@ public class BlockchainController {
 
     @PostMapping("/block")
     public void postBlock(@RequestBody BlockDto blockDto) {
+        log.debug("received block: " + blockDto);
         Peer sender = new Peer(blockDto.getMeta().getSenderAddress());
 
         Block block = blockDto.getBlock();
@@ -50,6 +54,7 @@ public class BlockchainController {
 
     @PostMapping("/peer")
     public void postPeerList(@RequestBody PeerListDto peerList) {
+        log.debug("received list of peers: " + peerList);
         Peer sender = new Peer(peerList.getMeta().getSenderAddress());
 
         List<Peer> peers = peerList.getPeerList();
@@ -64,6 +69,7 @@ public class BlockchainController {
 
     @PostMapping("/ping") // what does this name mean? new person registration?
     public void postPing(@RequestBody PingDto pingDto) {
+        log.debug("received ping: " + pingDto);
         Peer sender = new Peer(pingDto.getMeta().getSenderAddress());
 
         peerService.shareContactsWith(sender);

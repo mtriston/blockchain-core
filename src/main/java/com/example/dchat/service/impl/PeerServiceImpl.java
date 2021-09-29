@@ -6,12 +6,17 @@ import com.example.dchat.model.Peer;
 import com.example.dchat.model.Transaction;
 import com.example.dchat.repository.PeerRepository;
 import com.example.dchat.service.PeerService;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
+@Log4j2
 @Service
 public class PeerServiceImpl implements PeerService {
 
@@ -25,11 +30,17 @@ public class PeerServiceImpl implements PeerService {
         this.webClient = webClient;
         this.externalIp = getExternalIp();
         this.port = 8080;
+        log.info("Your node address - " + externalIp + ":" + port);
     }
 
     @Override
     public void addPeers(List<Peer> peers) {
-        peerRepository.savePeers(peers);
+        log.debug("Added/updated peers: " + peers);
+        peerRepository.savePeers(peers
+                .stream()
+                .peek(peer -> peer.setLastSeen(new Date(System.currentTimeMillis())))
+                .collect(Collectors.toList())
+        );
     }
 
     @Override
@@ -48,6 +59,7 @@ public class PeerServiceImpl implements PeerService {
 
     @Override
     public void sendBlock(Peer peer, Block block) {
+        log.debug(String.format("Send block %s\nTo peer %s", block, peer));
         webClient
                 .post()
                 .uri(peer.toString() + "/block")
@@ -67,6 +79,7 @@ public class PeerServiceImpl implements PeerService {
 
     @Override
     public void sendTransaction(Peer peer, Transaction transaction) {
+        log.debug(String.format("Send transaction %s\nTo peer %s", transaction, peer));
         webClient
                 .post()
                 .uri(peer.toString(), "/transaction")
@@ -76,19 +89,21 @@ public class PeerServiceImpl implements PeerService {
 
     @Override
     public void shareContactsWith(Peer recipient) {
+        log.debug("Share contacts with peer " + recipient);
         List<Peer> peers = peerRepository.getActivityPeers();
         webClient
                 .post()
-                .uri(recipient.toString(), "/peer")
+                .uri("http://"+ recipient.toString() + "/peer")
                 .body(Mono.just(new PeerListDto(getMeta(), peers)), PeerListDto.class)
                 .retrieve();
         }
 
     @Override
     public void sendPing(Peer peer, int chainLength) {
+        log.debug("Send ping to peer " + peer);
             webClient
                     .post()
-                    .uri(peer.toString(), "/ping")
+                    .uri("http://"+ peer.toString() + "/ping")
                     .body(Mono.just(new PingDto(getMeta(), chainLength)), PingDto.class)
                     .retrieve();
     }
@@ -98,10 +113,10 @@ public class PeerServiceImpl implements PeerService {
     }
 
     private String getExternalIp() {
-        return webClient
+        return Objects.requireNonNull(webClient
                 .get()
                 .uri("http://checkip.amazonaws.com")
                 .retrieve()
-                .bodyToMono(String.class).block();
+                .bodyToMono(String.class).block()).strip();
     }
 }

@@ -10,4 +10,5 @@ public interface TransactionService {
     void addTransaction(Transaction transaction);
     void removeTransactions(List<Transaction> transactions);
     List<Transaction> getTransactions();
+    Transaction createRewardTransaction();
 }

@@ -14,7 +14,8 @@ public class PeerRepositoryImpl implements PeerRepository {
 
     @Override
     public void savePeers(List<Peer> newPeers) {
-        this.peers.addAll(newPeers);
+        newPeers.forEach(peers::remove);
+        peers.addAll(newPeers);
     }
 
     @Override

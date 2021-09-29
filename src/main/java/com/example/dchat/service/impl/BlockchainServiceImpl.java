@@ -6,10 +6,12 @@ import com.example.dchat.repository.ChainRepository;
 import com.example.dchat.service.BlockchainService;
 import com.example.dchat.service.TransactionService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class BlockchainServiceImpl implements BlockchainService {
@@ -20,16 +22,18 @@ public class BlockchainServiceImpl implements BlockchainService {
     private final TransactionService transactionService;
 
     private Block createBlock() {
-        //TODO: подумать над созданием блока без транзакций
-        //TODO: добавить в блок транзакцию с вознаграждением // true
         List<Transaction> transactions = transactionService.getTransactions();
         transactions = transactions.subList(0, Math.min(transactions.size(), 20)); // c max fee, else -> random
+
+        transactions.add(transactionService.createRewardTransaction());
+
         Block lastBlock = chainRepository.getLastBlock();
         return new Block(lastBlock.getIndex() + 1, transactions, lastBlock.getHash());
     }
 
     @Override
     public Block addBlock(Block block) {
+        log.debug("added new block to chain: " + block);
         transactionService.removeTransactions(block.getTransactions());
         chainRepository.saveBlock(block);
         return block;
@@ -58,10 +62,12 @@ public class BlockchainServiceImpl implements BlockchainService {
 
     @Override
     public Block mineBlock() {
+        //TODO: подумать над созданием блока без транзакций. Можно в while просто идти на новую итерацию в крайнем случае
         Block block;
         do {
             block = createBlock();
         } while (!block.getHash().startsWith(HASH_PREFIX));
+        log.debug("Created new block: " + block);
         return addBlock(block);
     }
 }

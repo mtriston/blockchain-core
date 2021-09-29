@@ -28,7 +28,6 @@ public class Peer {
     public Peer(String address) {
         this.ip = address.split(":")[0];
         this.port = Integer.parseInt(address.split(":")[1]);
-        this.lastSeen = new Date(System.currentTimeMillis());
     }
 
     @Override
