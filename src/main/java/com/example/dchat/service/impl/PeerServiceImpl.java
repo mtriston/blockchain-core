@@ -7,6 +7,7 @@ import com.example.dchat.model.Transaction;
 import com.example.dchat.repository.PeerRepository;
 import com.example.dchat.service.PeerService;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -25,11 +26,11 @@ public class PeerServiceImpl implements PeerService {
     private final String externalIp;
     private final int port;
 
-    public PeerServiceImpl(PeerRepository peerRepository, WebClient webClient) {
+    public PeerServiceImpl(PeerRepository peerRepository, WebClient webClient, @Value("${server.port}") int port) {
         this.peerRepository = peerRepository;
         this.webClient = webClient;
         this.externalIp = getExternalIp();
-        this.port = 8080;
+        this.port = port;
         log.info("Your node address - " + externalIp + ":" + port);
     }
 
