@@ -14,5 +14,5 @@ public interface PeerService {
     void broadcastTransaction(Transaction transaction);
     void sendTransaction(Peer peer, Transaction transaction);
     void sendPing(Peer peer, int chainLength);
-    void shareContactsWith(Peer recipient);
+    void sharePeersWith(Peer recipient);
 }

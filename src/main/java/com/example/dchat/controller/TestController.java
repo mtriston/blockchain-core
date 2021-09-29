@@ -36,6 +36,6 @@ public class TestController {
 
     @GetMapping("/peer") // peers?
     List<Peer> getPeer() {
-        return peerRepository.getActivityPeers();
+        return peerRepository.getActivePeers();
     }
 }

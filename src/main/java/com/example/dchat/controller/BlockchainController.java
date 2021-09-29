@@ -12,6 +12,7 @@ import com.example.dchat.service.PeerService;
 import com.example.dchat.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,7 +28,7 @@ public class BlockchainController {
     private final PeerService peerService;
 
     @PostMapping("/transaction")
-    public void postTransaction(@RequestBody TransactionDto transactionDto) {
+    public String postTransaction(@RequestBody TransactionDto transactionDto) {
         log.debug("received transaction: " + transactionDto);
         Peer sender = new Peer(transactionDto.getMeta().getSenderAddress());
 
@@ -37,10 +38,11 @@ public class BlockchainController {
             peerService.broadcastTransaction(transaction);
         }
         peerService.addPeers(List.of(sender));
+        return "Transaction is received";
     }
 
     @PostMapping("/block")
-    public void postBlock(@RequestBody BlockDto blockDto) {
+    public String postBlock(@RequestBody BlockDto blockDto) {
         log.debug("received block: " + blockDto);
         Peer sender = new Peer(blockDto.getMeta().getSenderAddress());
 
@@ -50,10 +52,11 @@ public class BlockchainController {
             peerService.broadcastBlock(block);
         }
         peerService.addPeers(List.of(sender));
+        return "Block is received";
     }
 
     @PostMapping("/peer")
-    public void postPeerList(@RequestBody PeerListDto peerList) {
+    public String postPeerList(@RequestBody PeerListDto peerList) {
         log.debug("received list of peers: " + peerList);
         Peer sender = new Peer(peerList.getMeta().getSenderAddress());
 
@@ -65,14 +68,15 @@ public class BlockchainController {
         }
         peerService.addPeers(peers);
         peerService.addPeers(List.of(sender));
+        return "Peers are received";
     }
 
     @PostMapping("/ping") // what does this name mean? new person registration?
-    public void postPing(@RequestBody PingDto pingDto) {
+    public String postPing(@RequestBody PingDto pingDto) {
         log.debug("received ping: " + pingDto);
         Peer sender = new Peer(pingDto.getMeta().getSenderAddress());
 
-        peerService.shareContactsWith(sender);
+        peerService.sharePeersWith(sender);
 
         int otherChainLength = pingDto.getChainHeight();
         List<Block> myChain = blockchainService.getChain();
@@ -82,5 +86,6 @@ public class BlockchainController {
             }
         }
         peerService.addPeers(List.of(sender));
+        return "Ping are received";
     }
 }
