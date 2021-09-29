@@ -23,7 +23,7 @@ public class BlockchainServiceImpl implements BlockchainService {
 
     private Block createBlock() {
         List<Transaction> transactions = transactionService.getTransactions();
-        transactions = transactions.subList(0, Math.min(transactions.size(), 20)); // c max fee, else -> random
+        transactions = transactions.subList(0, Math.min(transactions.size(), 20)); // with max fee, else -> random
 
         transactions.add(transactionService.createRewardTransaction());
 
@@ -32,11 +32,10 @@ public class BlockchainServiceImpl implements BlockchainService {
     }
 
     @Override
-    public Block addBlock(Block block) {
+    public void addBlock(Block block) {
         log.debug("added new block to chain: " + block);
         transactionService.removeTransactions(block.getTransactions());
         chainRepository.saveBlock(block);
-        return block;
     }
 
     @Override
@@ -46,13 +45,11 @@ public class BlockchainServiceImpl implements BlockchainService {
 
     @Override
     public boolean isValidBlock(Block block) {
-        List<Transaction> transactions = block.getTransactions();
-        for (Transaction transaction : transactions) {
-            if (!transactionService.isValidTransaction(transaction))
-                return false;
-        }
         return Block.calculateBlockHash(block).equals(block.getHash()) &&
-                    chainRepository.getLastBlock().getHash().equals(block.getPreviousHash());
+                block.getHash().startsWith(HASH_PREFIX) &&
+                    chainRepository.getLastBlock().getHash().equals(block.getPreviousHash()) &&
+                        block.getTransactions().size() > 1 &&
+                            transactionService.isValidTransactionsFromBlock(block.getTransactions());
     }
 
     @Override
@@ -61,13 +58,13 @@ public class BlockchainServiceImpl implements BlockchainService {
     }
 
     @Override
-    public Block mineBlock() {
+    public void mineBlock() {
         //TODO: При отсутствии транзакций, цикл будет повторяться в холостую. Можно сделать лучше (например Producer\Consumer)
         Block block;
         do {
             block = createBlock();
-        } while (!block.getHash().startsWith(HASH_PREFIX) && block.getTransactions().size() <= 1);
+        } while (!isValidBlock(block));
         log.debug("Created new block: " + block);
-        return addBlock(block);
+        addBlock(block);
     }
 }

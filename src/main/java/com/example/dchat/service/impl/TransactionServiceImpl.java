@@ -19,7 +19,13 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public boolean isValidTransaction(Transaction transaction) {
         return true;
-        //TODO: реализовать проверку подписи // jasypt or JKS
+        //TODO: реализовать проверку подписи jasypt or JKS
+    }
+
+    @Override
+    public boolean isValidTransactionsFromBlock(List<Transaction> transaction) {
+        return true;
+        // TODO: проверить транзакцию с наградой
     }
 
     @Override
@@ -49,6 +55,6 @@ public class TransactionServiceImpl implements TransactionService {
         //TODO: подумать, нужно ли что-то шифровать/подписывать
         //TODO: в получателя установить public key текущего узла.
         //TODO: вынести значения в константы, когда станет понятно, как это должно выглядеть
-        return new Transaction("System", "PUBLIC KEY", "Кeward for a new block", 10);
+        return new Transaction("System", "PUBLIC KEY", "Reward for a new block", 10);
     }
 }
