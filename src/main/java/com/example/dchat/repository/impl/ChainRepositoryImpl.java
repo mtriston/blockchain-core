@@ -30,7 +30,7 @@ public class ChainRepositoryImpl implements ChainRepository {
 
     @Override
     public Block getLastBlock() {
-        return blockchain.get(blockchain.size() - 1);
+        return blockchain.get(blockchain.size() - 1); // NPE if blockchain is empty
     }
 
     @Override

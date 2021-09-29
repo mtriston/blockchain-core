@@ -21,9 +21,9 @@ public class BlockchainServiceImpl implements BlockchainService {
 
     private Block createBlock() {
         //TODO: подумать над созданием блока без транзакций
-        //TODO: добавить в блок транзакцию с вознаграждением
+        //TODO: добавить в блок транзакцию с вознаграждением // true
         List<Transaction> transactions = transactionService.getTransactions();
-        transactions = transactions.subList(0, Math.min(transactions.size(), 20));
+        transactions = transactions.subList(0, Math.min(transactions.size(), 20)); // c max fee, else -> random
         Block lastBlock = chainRepository.getLastBlock();
         return new Block(lastBlock.getIndex() + 1, transactions, lastBlock.getHash());
     }

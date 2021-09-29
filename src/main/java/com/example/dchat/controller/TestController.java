@@ -24,7 +24,7 @@ public class TestController {
     private final PeerService peerService;
     private final PeerRepository peerRepository;
 
-    @GetMapping("/transaction")
+    @GetMapping("/transaction") // transactions?
     List<Transaction> getTransactions() {
         return transactionRepository.getTransactions();
     }
@@ -34,7 +34,7 @@ public class TestController {
         return blockchainService.getChain();
     }
 
-    @GetMapping("/peer")
+    @GetMapping("/peer") // peers?
     List<Peer> getPeer() {
         return peerRepository.getActivityPeers();
     }

@@ -16,11 +16,15 @@ import java.util.logging.Level;
 @NoArgsConstructor
 public class Block {
     private int index;
-    private String hash;
     private String previousHash;
     private List<Transaction> transactions;
     long timeStamp;
     private int nonce;
+    // private String contentHash; // this is only content (transactions) hash - not sure we need it
+    private String hash; // this is block hash
+
+    // Note: we need to know that block was mined by someone concrete (he adds coins to his wallet after mining)
+    // Question: how would peer add the coin to his "account"?
 
     public Block(int index, List<Transaction> transactions, String previousHash) {
         this.index = index;

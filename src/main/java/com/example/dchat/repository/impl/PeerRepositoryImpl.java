@@ -23,7 +23,7 @@ public class PeerRepositoryImpl implements PeerRepository {
     }
 
     @Override
-    public List<Peer> getActivityPeers() {
+    public List<Peer> getActivityPeers() { // active, not activity
         return peers.stream()
                 .sorted(Comparator.comparing(Peer::getLastSeen))
                 .collect(Collectors.toList()).subList(0, Math.min(peers.size(), 20));

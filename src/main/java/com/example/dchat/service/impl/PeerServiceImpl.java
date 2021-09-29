@@ -15,6 +15,7 @@ import java.util.List;
 @Service
 public class PeerServiceImpl implements PeerService {
 
+    private static final int PORT = 8080;
     private final PeerRepository peerRepository;
     private final WebClient webClient;
     private final String externalIp;
@@ -23,8 +24,8 @@ public class PeerServiceImpl implements PeerService {
     public PeerServiceImpl(PeerRepository peerRepository, WebClient webClient) {
         this.peerRepository = peerRepository;
         this.webClient = webClient;
-        this.externalIp = getExternalIp();
-        this.port = 8080;
+        this.externalIp = getExternalIp(); // explain
+        this.port = PORT;
     }
 
     @Override
@@ -34,6 +35,7 @@ public class PeerServiceImpl implements PeerService {
 
     @Override
     public void broadcastBlock(Block block) {
+        // Mb first we send block hash and then -> block (not sure) -> to minimize traffic
         List<Peer> peers = peerRepository.getActivityPeers();
         for (Peer peer : peers) {
             sendBlock(peer, block);
@@ -41,7 +43,7 @@ public class PeerServiceImpl implements PeerService {
     }
 
     @Override
-    public void sendBlock(Peer peer, Block block) {
+    public void sendBlock(Peer peer, Block block) { // explain pls Mono and other
         webClient
                 .post()
                 .uri(peer.toString() + "/block")
@@ -50,7 +52,9 @@ public class PeerServiceImpl implements PeerService {
     }
 
     @Override
-    public void broadcastTransaction(Transaction transaction) {
+    public void broadcastTransaction(Transaction transaction) { // 1. Mb with transaction service?
+        // in this method we should first send transaction hash (to minimize traffic)
+        // If the recipient doesn't have this transaction -> then we send it to him
         List<Peer> peers = peerRepository.getActivityPeers();
         for (Peer peer : peers) {
             sendTransaction(peer, transaction);
@@ -77,10 +81,10 @@ public class PeerServiceImpl implements PeerService {
         }
 
     @Override
-    public void sendPing(Peer peer, int chainLength) {
+    public void sendPing(Peer peer, int chainLength) { // explain
             webClient
                     .post()
-                    .uri(peer.toString(), "/transaction")
+                    .uri(peer.toString(), "/transaction") // mb "/ping" ?
                     .body(Mono.just(new PingDto(getMeta(), chainLength)), PingDto.class)
                     .retrieve();
     }
@@ -89,7 +93,7 @@ public class PeerServiceImpl implements PeerService {
         return new MetaDto(externalIp + ":" + port);
     }
 
-    private String getExternalIp() {
+    private String getExternalIp() { // explain
         return webClient
                 .get()
                 .uri("http://checkip.amazonaws.com")
