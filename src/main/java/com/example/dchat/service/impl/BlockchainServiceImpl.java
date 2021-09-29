@@ -62,11 +62,11 @@ public class BlockchainServiceImpl implements BlockchainService {
 
     @Override
     public Block mineBlock() {
-        //TODO: подумать над созданием блока без транзакций. Можно в while просто идти на новую итерацию в крайнем случае
+        //TODO: При отсутствии транзакций, цикл будет повторяться в холостую. Можно сделать лучше (например Producer\Consumer)
         Block block;
         do {
             block = createBlock();
-        } while (!block.getHash().startsWith(HASH_PREFIX));
+        } while (!block.getHash().startsWith(HASH_PREFIX) && block.getTransactions().size() <= 1);
         log.debug("Created new block: " + block);
         return addBlock(block);
     }
