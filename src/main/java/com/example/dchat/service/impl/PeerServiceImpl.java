@@ -33,6 +33,11 @@ public class PeerServiceImpl implements PeerService {
     }
 
     @Override
+    public boolean isContains(Peer peer) {
+        return peerRepository.isContains(peer);
+    }
+
+    @Override
     public void broadcastBlock(Block block) {
         List<Peer> peers = peerRepository.getActivityPeers();
         for (Peer peer : peers) {
@@ -80,7 +85,7 @@ public class PeerServiceImpl implements PeerService {
     public void sendPing(Peer peer, int chainLength) {
             webClient
                     .post()
-                    .uri(peer.toString(), "/transaction")
+                    .uri(peer.toString(), "/ping")
                     .body(Mono.just(new PingDto(getMeta(), chainLength)), PingDto.class)
                     .retrieve();
     }

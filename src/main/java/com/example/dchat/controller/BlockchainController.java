@@ -29,7 +29,7 @@ public class BlockchainController {
         Peer sender = new Peer(transactionDto.getMeta().getSenderAddress());
 
         Transaction transaction = transactionDto.getTransaction();
-        if (transactionService.isValidTransaction(transaction) && transactionService.isContains(transaction)) {
+        if (transactionService.isValidTransaction(transaction) && !transactionService.isContains(transaction)) {
             transactionService.addTransaction(transaction);
             peerService.broadcastTransaction(transaction);
         }
@@ -41,7 +41,7 @@ public class BlockchainController {
         Peer sender = new Peer(blockDto.getMeta().getSenderAddress());
 
         Block block = blockDto.getBlock();
-        if (blockchainService.isValidBlock(block) && blockchainService.isContains(block)) {
+        if (blockchainService.isValidBlock(block) && !blockchainService.isContains(block)) {
             blockchainService.addBlock(block);
             peerService.broadcastBlock(block);
         }
@@ -55,7 +55,8 @@ public class BlockchainController {
         List<Peer> peers = peerList.getPeerList();
         int chainLength = blockchainService.getChain().size();
         for (Peer peer : peers) {
-            peerService.sendPing(peer, chainLength);
+            if (!peerService.isContains(peer))
+                peerService.sendPing(peer, chainLength);
         }
         peerService.addPeers(peers);
         peerService.addPeers(List.of(sender));

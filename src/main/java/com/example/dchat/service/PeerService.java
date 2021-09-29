@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface PeerService {
     void addPeers(List<Peer> peers);
+    boolean isContains(Peer peer);
     void broadcastBlock(Block block);
     void sendBlock(Peer peer, Block block);
     void broadcastTransaction(Transaction transaction);

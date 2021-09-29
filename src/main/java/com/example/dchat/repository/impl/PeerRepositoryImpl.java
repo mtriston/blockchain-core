@@ -28,4 +28,9 @@ public class PeerRepositoryImpl implements PeerRepository {
                 .sorted(Comparator.comparing(Peer::getLastSeen))
                 .collect(Collectors.toList()).subList(0, Math.min(peers.size(), 20));
     }
+
+    @Override
+    public boolean isContains(Peer peer) {
+        return peers.contains(peer);
+    }
 }
