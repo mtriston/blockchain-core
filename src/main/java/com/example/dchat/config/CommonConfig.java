@@ -1,5 +1,6 @@
 package com.example.dchat.config;
 
+import com.example.dchat.service.AsymmetricCryptography;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
@@ -27,5 +28,10 @@ public class CommonConfig {
         return WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .build();
+    }
+
+    @Bean
+    public AsymmetricCryptography asymmetricCryptography() {
+        return new AsymmetricCryptography();
     }
 }
