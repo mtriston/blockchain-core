@@ -14,6 +14,8 @@ public class DchatApplication {
 
     private static void generateEncryptionKeys() {
         try {
+            // TODO: check if there is key pair in ./secrets directory
+
             new KeysGenerator(ENCRYPTION_KEY_LENGTH)
                     .generateKeyPair();
         }
