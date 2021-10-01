@@ -1,27 +1,26 @@
 package com.example.dchat;
 
 import com.example.dchat.service.KeysGenerator;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-
+@Log4j2
 @SpringBootApplication
 public class DchatApplication {
 
     private static final int ENCRYPTION_KEY_LENGTH = 1024; // to properties
 
     private static void generateEncryptionKeys() {
-        try {
-            // TODO: check if there is key pair in ./secrets directory
+        // TODO: check if there is key pair in ./secrets directory
 
+        try {
             new KeysGenerator(ENCRYPTION_KEY_LENGTH)
                     .generateKeyPair();
+        } catch (Exception e) {
+            log.debug(e.getMessage());
         }
-        catch (NoSuchAlgorithmException | NoSuchProviderException e){
-            System.err.println(e.getMessage());
-        }
+
     }
 
     public static void main(String[] args) {

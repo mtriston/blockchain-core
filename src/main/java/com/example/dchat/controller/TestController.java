@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 //TODO: удалить контроллер. Нужен только для отладки
@@ -26,16 +27,16 @@ public class TestController {
 
     @GetMapping("/transaction") // transactions?
     List<Transaction> getTransactions() {
-        return transactionRepository.getTransactions();
+        return new ArrayList<>(transactionRepository.getTransactions());
     }
 
     @GetMapping("/chain")
     List<Block> getChain() {
-        return blockchainService.getChain();
+        return new ArrayList<>(blockchainService.getChain());
     }
 
     @GetMapping("/peer") // peers?
     List<Peer> getPeer() {
-        return peerRepository.getActivePeers();
+        return new ArrayList<>(peerRepository.getActivePeers());
     }
 }

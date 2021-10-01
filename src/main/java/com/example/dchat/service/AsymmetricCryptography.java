@@ -2,6 +2,7 @@ package com.example.dchat.service;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -57,7 +58,7 @@ public class AsymmetricCryptography {
             BadPaddingException, InvalidKeyException {
 
         this.cipher.init(Cipher.ENCRYPT_MODE, this.privateKey);
-        return Base64.encodeBase64String(cipher.doFinal(msg.getBytes("UTF-8")));
+        return Base64.encodeBase64String(cipher.doFinal(msg.getBytes(StandardCharsets.UTF_8)));
     }
 
     public String decryptMsg(String msg, String key) throws InvalidKeyException, UnsupportedEncodingException,
@@ -69,6 +70,6 @@ public class AsymmetricCryptography {
         PublicKey publicKey = keyFactory.generatePublic(keySpec);
 
         this.cipher.init(Cipher.DECRYPT_MODE, publicKey);
-        return new String(cipher.doFinal(Base64.decodeBase64(msg)), "UTF-8");
+        return new String(cipher.doFinal(Base64.decodeBase64(msg)), StandardCharsets.UTF_8);
     }
 }
