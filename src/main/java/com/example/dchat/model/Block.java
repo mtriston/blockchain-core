@@ -1,7 +1,6 @@
 package com.example.dchat.model;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Value;
 import lombok.extern.java.Log;
 
 import java.nio.charset.StandardCharsets;
@@ -12,24 +11,23 @@ import java.util.Random;
 import java.util.logging.Level;
 
 @Log
-@Data
-@NoArgsConstructor
+@Value
 public class Block {
-    private int index;
-    private String previousHash;
-    private List<Transaction> transactions;
+    int index;
+    String previousHash;
+    List<Transaction> transactions;
     long timeStamp;
-    private int nonce;
+    int nonce;
     // private String contentHash; // this is only content (transactions) hash - not sure we need it
-    private String hash; // this is block hash
+    String hash; // this is block hash
 
     // Note: we need to know that block was mined by someone concrete (he adds coins to his wallet after mining)
     // Question: how would peer add the coin to his "account"?
 
     public Block(int index, List<Transaction> transactions, String previousHash) {
         this.index = index;
-        this.transactions = transactions;
         this.previousHash = previousHash;
+        this.transactions = transactions;
         this.timeStamp = System.currentTimeMillis() / 1000;
         this.nonce = new Random().nextInt();
         this.hash = calculateBlockHash(this);

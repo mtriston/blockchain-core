@@ -1,13 +1,14 @@
 package com.example.dchat.model;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.Value;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
-@Data
-@NoArgsConstructor
+@Value
+@AllArgsConstructor
 public class Peer {
     // private String login; // may be this will be some kind of registration. And how the fuck will you know the sender else?
     // If we have dchat -> so the point is -> it should store every word of every person. (changeless history)
@@ -20,14 +21,13 @@ public class Peer {
     // private key or recipient (if the message have the recipient) -> it also should be SIGNED with
     // private key of the sender!!!
     // So we need to validate the users login
-    private String ip; // it can and would be dynamical in most cases, so we need permanent login
-    private int port;
-    Date lastSeen;
+    String address;
+    LocalDateTime lastSeen;
     // private String publicKey; // we need this to encrypt messages, don't we?
 
-    public Peer(String address) {
-        this.ip = address.split(":")[0];
-        this.port = Integer.parseInt(address.split(":")[1]);
+    public Peer(@NonNull String address) {
+        this.address = address;
+        this.lastSeen = LocalDateTime.now();
     }
 
     @Override
@@ -35,18 +35,16 @@ public class Peer {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Peer peer = (Peer) o;
-        return port == peer.port && ip.equals(peer.ip); // + login? else -> if ip is dynamical (it is) and smb else will get it?
-        // or uniqueness of the peer is login+public key?
-
+        return address.equals(peer.address);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(ip, port);
+        return Objects.hash(address);
     }
 
     @Override
     public String toString() {
-        return ip + ":" + port;
+        return address;
     }
 }

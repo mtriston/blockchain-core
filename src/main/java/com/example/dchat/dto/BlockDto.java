@@ -2,11 +2,9 @@ package com.example.dchat.dto;
 
 import com.example.dchat.model.Block;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Value;
 
-@Data
-@NoArgsConstructor
+@Value
 @AllArgsConstructor
 public class BlockDto {
     MetaDto meta;
