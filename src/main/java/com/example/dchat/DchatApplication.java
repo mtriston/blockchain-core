@@ -28,5 +28,4 @@ public class DchatApplication {
         generateEncryptionKeys();
         SpringApplication.run(DchatApplication.class, args);
     }
-
 }
