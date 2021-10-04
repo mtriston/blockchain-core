@@ -30,21 +30,26 @@ public class KeysGenerator {
         return this.publicKey;
     }
 
-    public void writeToFile(String path, byte[] key) throws IOException {
+    public void writeToFile(String path, byte[] key, boolean isPrivate) throws IOException {
         File f = new File(path);
         f.getParentFile().mkdirs();
 
-        FileOutputStream fos = new FileOutputStream(f);
-        fos.write(key);
-        fos.flush();
-        fos.close();
+        try (FileOutputStream fos = new FileOutputStream(f)) {
+            fos.write(key);
+            fos.flush();
+        }
+        f.setExecutable(false);
+        f.setWritable(false);
+        if (isPrivate) {
+            f.setReadable(true, true);
+        }
     }
 
     public void generateKeyPair() {
         try {
             createKeys();
-            writeToFile("secrets/publicKey", getPublicKey().getEncoded());
-            writeToFile("secrets/privateKey", getPrivateKey().getEncoded());
+            writeToFile("secrets/public.key", getPublicKey().getEncoded(), false);
+            writeToFile("secrets/private.key", getPrivateKey().getEncoded(), true);
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }

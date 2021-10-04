@@ -10,7 +10,7 @@ import java.security.NoSuchProviderException;
 @SpringBootApplication
 public class DchatApplication {
 
-    private static final int ENCRYPTION_KEY_LENGTH = 1024; // to properties
+    private static final int ENCRYPTION_KEY_LENGTH = 2048; // to properties
 
     private static void generateEncryptionKeys() {
         try {
