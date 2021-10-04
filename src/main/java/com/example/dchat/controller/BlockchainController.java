@@ -12,12 +12,12 @@ import com.example.dchat.service.PeerService;
 import com.example.dchat.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Log4j2
 @RestController
@@ -60,7 +60,7 @@ public class BlockchainController {
         log.debug("received list of peers: " + peerList);
         Peer sender = new Peer(peerList.getMeta().getSenderAddress());
 
-        List<Peer> peers = peerList.getPeerList();
+        List<Peer> peers = peerList.getPeerList().stream().map(Peer::new).collect(Collectors.toList());
         int chainLength = blockchainService.getChain().size();
         for (Peer peer : peers) {
             if (!peerService.isContains(peer))

@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -29,8 +28,8 @@ public class PeerServiceImpl implements PeerService {
     public PeerServiceImpl(PeerRepository peerRepository, WebClient webClient, @Value("${server.port}") int port) {
         this.peerRepository = peerRepository;
         this.webClient = webClient;
-//        this.externalIp = getExternalIp();
-        this.ip = "localhost";
+        this.ip = getIp();
+//        this.ip = "localhost";
         this.port = port;
         log.info("Your node address - " + ip + ":" + port);
     }
@@ -38,11 +37,7 @@ public class PeerServiceImpl implements PeerService {
     @Override
     public void addPeers(List<Peer> peers) {
         log.debug("Added/updated peers: " + peers);
-        peerRepository.savePeers(peers
-                .stream()
-                .peek(peer -> peer.setLastSeen(new Date(System.currentTimeMillis())))
-                .collect(Collectors.toList())
-        );
+        peerRepository.savePeers(peers);
     }
 
     @Override
@@ -93,7 +88,10 @@ public class PeerServiceImpl implements PeerService {
     public void sharePeersWith(Peer recipient) {
 
         log.debug("Share contacts with peer " + recipient);
-        List<Peer> peers = peerRepository.getActivePeers();
+        List<String> peers = peerRepository.getActivePeers()
+                .stream()
+                .map(Peer::getAddress)
+                .collect(Collectors.toList());
         webClient
                 .post()
                 .uri("http://" + recipient.toString() + "/peer")

@@ -1,11 +1,9 @@
 package com.example.dchat.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Value;
 
-@Data
-@NoArgsConstructor
+@Value
 @AllArgsConstructor
 public class MetaDto { // why do we need this anyway?
                         // pingDto.getMeta().getSenderAddress() looks odd.

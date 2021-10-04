@@ -70,6 +70,7 @@ public class AsymmetricCryptography {
 
         Cipher encryptCipher = Cipher.getInstance("RSA");
 
+<<<<<<< HEAD
         PublicKey recipientPublicKey = stringToPublicKey(recipientPublicKeyString);
 
         encryptCipher.init(Cipher.ENCRYPT_MODE, recipientPublicKey);
@@ -77,6 +78,10 @@ public class AsymmetricCryptography {
         byte[] encryptedMsgBytes = encryptCipher.doFinal(msgBytes);
         String encryptedMsg = java.util.Base64.getEncoder().encodeToString(encryptedMsgBytes);
         return encryptedMsg;
+=======
+        this.cipher.init(Cipher.ENCRYPT_MODE, this.privateKey);
+        return Base64.encodeBase64String(cipher.doFinal(msg.getBytes(StandardCharsets.UTF_8)));
+>>>>>>> 508b31ae580151c394069bb51a04a6e208bf914a
     }
 
     public String decryptMsg(String msg, String key) throws InvalidKeyException, UnsupportedEncodingException,
@@ -90,6 +95,11 @@ public class AsymmetricCryptography {
         byte[] decryptedMsgBytes = decryptCipher.doFinal(encryptedMsgBytes);
         String decryptedMsg = new String(decryptedMsgBytes, StandardCharsets.UTF_8);
 
+<<<<<<< HEAD
         return decryptedMsg;
+=======
+        this.cipher.init(Cipher.DECRYPT_MODE, publicKey);
+        return new String(cipher.doFinal(Base64.decodeBase64(msg)), StandardCharsets.UTF_8);
+>>>>>>> 508b31ae580151c394069bb51a04a6e208bf914a
     }
 }

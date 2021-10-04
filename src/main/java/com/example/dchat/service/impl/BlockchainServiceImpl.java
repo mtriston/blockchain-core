@@ -7,8 +7,11 @@ import com.example.dchat.service.BlockchainService;
 import com.example.dchat.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.List;
 
 @Log4j2
@@ -16,16 +19,28 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BlockchainServiceImpl implements BlockchainService {
 
-    private final static String HASH_PREFIX = "000";
+    @Value("${mining.hash.prefix}")
+    private String HASH_PREFIX;
+    @Value("${mining.transaction.pool.size}")
+    private int TRANSACTION_POOL_SIZE;
 
     private final ChainRepository chainRepository;
     private final TransactionService transactionService;
 
-    private Block createBlock() {
-        List<Transaction> transactions = transactionService.getTransactions();
-        transactions = transactions.subList(0, Math.min(transactions.size(), 20)); // with max fee, else -> random
+    @PostConstruct
+    private void runMining() {
+        new Thread(() -> {
+            while (true) {
+                mineBlock();
+            }
+        }).start();
+    }
 
-        transactions.add(transactionService.createRewardTransaction());
+    private Block createBlock() {
+        List<Transaction> transactions = new ArrayList<>(transactionService.getTransactions());
+        transactions = transactions.subList(0, Math.min(transactions.size(), TRANSACTION_POOL_SIZE)); // with max fee, else -> random
+
+        transactions.add(0, transactionService.createRewardTransaction());
 
         Block lastBlock = chainRepository.getLastBlock();
         return new Block(lastBlock.getIndex() + 1, transactions, lastBlock.getHash());
@@ -33,7 +48,7 @@ public class BlockchainServiceImpl implements BlockchainService {
 
     @Override
     public void addBlock(Block block) {
-        log.debug("added new block to chain: " + block);
+        log.debug("Added new block to chain: " + block);
         transactionService.removeTransactions(block.getTransactions());
         chainRepository.saveBlock(block);
     }
@@ -47,9 +62,8 @@ public class BlockchainServiceImpl implements BlockchainService {
     public boolean isValidBlock(Block block) {
         return Block.calculateBlockHash(block).equals(block.getHash()) &&
                 block.getHash().startsWith(HASH_PREFIX) &&
-                    chainRepository.getLastBlock().getHash().equals(block.getPreviousHash()) &&
-                        block.getTransactions().size() > 1 &&
-                            transactionService.isValidTransactionsFromBlock(block.getTransactions());
+                chainRepository.getLastBlock().getHash().equals(block.getPreviousHash()) &&
+                transactionService.isValidTransactionsFromBlock(block.getTransactions());
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.example.dchat.repository.TransactionRepository;
 import com.example.dchat.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,28 +15,27 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
 
+    @Value("${mining.reward.amount}")
+    private Double MINING_REWARD_AMOUNT;
+    @Value("${mining.reward.sender}")
+    private String MINING_REWARD_SENDER;
+
     private final TransactionRepository transactionRepository;
-    public static final int MINING_REWARD = 1; // to properties
+
 
     @Override
     public boolean isValidTransaction(Transaction transaction) {
         //TODO: реализовать проверку подписи jasypt or JKS
-
         return true;
     }
 
     @Override
     public boolean isValidTransactionsFromBlock(List<Transaction> transactions) {
-        // TODO: проверить транзакцию с наградой
-        if (transactions == null || transactions.size() <= 1 ||
-                !(transactions.get(0).getSender().equals("BLOCK_CHAIN_BANK") &&
-                        transactions.get(0).getAmount().equals(MINING_REWARD) &&
-                        transactions.get(0).getFee().equals(0))) {
-            return false;
-        }
-        return transactions.stream()
-                .skip(1)
-                .allMatch(this::isValidTransaction);
+        return transactions != null &&
+            transactions.size() > 1 &&
+            transactions.get(0).getSender().equals(MINING_REWARD_SENDER) &&
+            transactions.get(0).getAmount().equals(MINING_REWARD_AMOUNT) &&
+            transactions.stream().skip(1).allMatch(this::isValidTransaction);
     }
 
     @Override
@@ -65,6 +65,6 @@ public class TransactionServiceImpl implements TransactionService {
         //TODO: подумать, нужно ли что-то шифровать/подписывать
         //TODO: в получателя установить public key текущего узла.
         //TODO: вынести значения в константы, когда станет понятно, как это должно выглядеть
-        return new Transaction("System", "PUBLIC KEY", "Reward for a new block", 10, 0.0);
+        return new Transaction(MINING_REWARD_SENDER, "PUBLIC KEY", "Reward for a new block", MINING_REWARD_AMOUNT, 0.0);
     }
 }
