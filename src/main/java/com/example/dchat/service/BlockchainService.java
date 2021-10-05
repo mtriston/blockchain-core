@@ -9,5 +9,5 @@ public interface BlockchainService {
     List<Block> getChain();
     boolean isValidBlock(Block block);
     boolean isContains(Block block);
-    void mineBlock();
+    Block mineBlock();
 }

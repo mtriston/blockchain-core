@@ -20,6 +20,7 @@ public class Block {
     int nonce;
     // private String contentHash; // this is only content (transactions) hash - not sure we need it
     String hash; // this is block hash
+    //TODO: String Mined_by?
 
     // Note: we need to know that block was mined by someone concrete (he adds coins to his wallet after mining)
     // Question: how would peer add the coin to his "account"?

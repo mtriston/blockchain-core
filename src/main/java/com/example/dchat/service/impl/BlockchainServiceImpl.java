@@ -4,14 +4,12 @@ import com.example.dchat.model.Block;
 import com.example.dchat.model.Transaction;
 import com.example.dchat.repository.ChainRepository;
 import com.example.dchat.service.BlockchainService;
-import com.example.dchat.service.PeerService;
 import com.example.dchat.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,16 +25,6 @@ public class BlockchainServiceImpl implements BlockchainService {
 
     private final ChainRepository chainRepository;
     private final TransactionService transactionService;
-    private final PeerService peerService;
-
-    @PostConstruct
-    private void runMining() {
-        new Thread(() -> {
-            while (true) {
-                mineBlock();
-            }
-        }).start();
-    }
 
     private Block createBlock() {
         List<Transaction> transactions = new ArrayList<>(transactionService.getTransactions());
@@ -74,7 +62,7 @@ public class BlockchainServiceImpl implements BlockchainService {
     }
 
     @Override
-    public void mineBlock() {
+    public Block mineBlock() {
         //TODO: При отсутствии транзакций, цикл будет повторяться в холостую. Можно сделать лучше (например Producer\Consumer)
         Block block;
         do {
@@ -82,6 +70,6 @@ public class BlockchainServiceImpl implements BlockchainService {
         } while (!isValidBlock(block));
         log.debug("Created new block: " + block);
         addBlock(block);
-        peerService.broadcastBlock(block);
+        return block;
     }
 }

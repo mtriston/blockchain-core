@@ -10,4 +10,6 @@ public interface BlockchainFacade {
     void handleTransaction(TransactionDto transactionDto);
     void handlePing(PingDto pingDto);
     void handlePeerList(PeerListDto peerListDto);
+    void resumeMining();
+    void pauseMining();
 }

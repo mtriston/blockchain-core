@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,6 +26,19 @@ public class BlockchainFacadeImpl implements BlockchainFacade {
     private final BlockchainService blockchainService;
     private final TransactionService transactionService;
     private final PeerService peerService;
+    private Thread miningThread;
+
+    @PostConstruct
+    private void init() {
+        miningThread = new Thread(() -> {
+            while (true) {
+                Block block = blockchainService.mineBlock();
+                peerService.broadcastBlock(block);
+            }
+        });
+        miningThread.start();
+        log.info("Mining launched");
+    }
 
     @Override
     public void handleBlock(BlockDto blockDto) {
@@ -35,6 +49,9 @@ public class BlockchainFacadeImpl implements BlockchainFacade {
         if (blockchainService.isValidBlock(block) && !blockchainService.isContains(block)) {
             blockchainService.addBlock(block);
             peerService.broadcastBlock(block);
+        } else {
+            //TODO: resolve conflict
+
         }
         peerService.addPeers(List.of(sender));
     }
@@ -82,5 +99,21 @@ public class BlockchainFacadeImpl implements BlockchainFacade {
         }
         peerService.addPeers(peers);
         peerService.addPeers(List.of(sender));
+    }
+
+    @Override
+    public synchronized void resumeMining() {
+        log.info("Mining resumed");
+        miningThread.notify();
+    }
+
+    @Override
+    public synchronized void pauseMining() {
+        log.info("Mining paused");
+        try {
+            miningThread.wait();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
