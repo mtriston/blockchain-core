@@ -49,11 +49,22 @@ public class BlockchainServiceImpl implements BlockchainService {
     }
 
     @Override
+    public void setChain(List<Block> chain) {
+        chainRepository.setChain(chain);
+    }
+
+    @Override
     public boolean isValidBlock(Block block) {
         return Block.calculateBlockHash(block).equals(block.getHash()) &&
                 block.getHash().startsWith(HASH_PREFIX) &&
                 chainRepository.getLastBlock().getHash().equals(block.getPreviousHash()) &&
                 transactionService.isValidTransactionsFromBlock(block.getTransactions());
+    }
+
+    @Override
+    public boolean isValidChain(List<Block> chain) {
+        //todo: реализовать
+        return false;
     }
 
     @Override

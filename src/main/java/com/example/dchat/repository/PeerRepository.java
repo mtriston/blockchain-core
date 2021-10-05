@@ -8,7 +8,7 @@ public interface PeerRepository {
 
     void savePeers(List<Peer> newPeers);
     void removePeer(Peer peer); // or remove not active peers (for last 3 months for example)
-    List<Peer> getActivePeers();
+    List<Peer> getPeers();
     boolean isContains(Peer peer);
 
 }

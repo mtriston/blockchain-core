@@ -1,11 +1,9 @@
 package com.example.dchat.service;
 
-import com.example.dchat.dto.BlockDto;
-import com.example.dchat.dto.PeerListDto;
-import com.example.dchat.dto.PingDto;
-import com.example.dchat.dto.TransactionDto;
+import com.example.dchat.dto.*;
 
 public interface BlockchainFacade {
+    ChainDto getChain();
     void handleBlock(BlockDto blockDto);
     void handleTransaction(TransactionDto transactionDto);
     void handlePing(PingDto pingDto);

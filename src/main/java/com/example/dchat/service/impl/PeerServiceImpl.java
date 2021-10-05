@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -28,8 +29,8 @@ public class PeerServiceImpl implements PeerService {
     public PeerServiceImpl(PeerRepository peerRepository, WebClient webClient, @Value("${server.port}") int port) {
         this.peerRepository = peerRepository;
         this.webClient = webClient;
-        this.ip = getIp();
-//        this.ip = "localhost";
+//        this.ip = getIp();
+        this.ip = "localhost";
         this.port = port;
         log.info("Your node address - " + ip + ":" + port);
     }
@@ -48,7 +49,7 @@ public class PeerServiceImpl implements PeerService {
     @Override
     public void broadcastBlock(Block block) {
         // Mb first we send block hash and then -> block (not sure) -> to minimize traffic
-        List<Peer> peers = peerRepository.getActivePeers();
+        List<Peer> peers = getActivePeers();
         for (Peer peer : peers) {
             sendBlock(peer, block);
         }
@@ -68,7 +69,7 @@ public class PeerServiceImpl implements PeerService {
     public void broadcastTransaction(Transaction transaction) { // 1. Mb with transaction service?
         // in this method we should first send transaction hash (to minimize traffic)
         // If the recipient doesn't have this transaction -> then we send it to him
-        List<Peer> peers = peerRepository.getActivePeers();
+        List<Peer> peers = getActivePeers();
         for (Peer peer : peers) {
             sendTransaction(peer, transaction);
         }
@@ -88,7 +89,7 @@ public class PeerServiceImpl implements PeerService {
     public void sharePeersWith(Peer recipient) {
 
         log.debug("Share contacts with peer " + recipient);
-        List<String> peers = peerRepository.getActivePeers()
+        List<String> peers = getActivePeers()
                 .stream()
                 .map(Peer::getAddress)
                 .collect(Collectors.toList());
@@ -100,6 +101,23 @@ public class PeerServiceImpl implements PeerService {
         }
 
     @Override
+    public List<Peer> getActivePeers() {
+        List<Peer> peers = peerRepository.getPeers();
+        return peers.stream()
+                .sorted(Comparator.comparing(Peer::getLastSeen))
+                .collect(Collectors.toList()).subList(0, Math.min(peers.size(), 20));
+    }
+
+    @Override
+    public ChainDto getChainFromPeer(Peer peer) {
+        return webClient
+                .get()
+                .uri("http://" + peer.toString() + "/chain")
+                .retrieve()
+                .bodyToMono(ChainDto.class).block();
+    }
+
+    @Override
     public void sendPing(Peer peer, int chainLength) {
         log.debug("Send ping to peer " + peer);
             webClient
@@ -109,7 +127,8 @@ public class PeerServiceImpl implements PeerService {
                     .retrieve().bodyToMono(String.class).subscribe();
     }
 
-    private MetaDto getMeta() {
+    @Override
+    public MetaDto getMeta() {
         return new MetaDto(ip + ":" + port);
     }
 

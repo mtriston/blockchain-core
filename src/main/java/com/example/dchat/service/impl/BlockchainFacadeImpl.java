@@ -1,9 +1,6 @@
 package com.example.dchat.service.impl;
 
-import com.example.dchat.dto.BlockDto;
-import com.example.dchat.dto.PeerListDto;
-import com.example.dchat.dto.PingDto;
-import com.example.dchat.dto.TransactionDto;
+import com.example.dchat.dto.*;
 import com.example.dchat.model.Block;
 import com.example.dchat.model.Peer;
 import com.example.dchat.model.Transaction;
@@ -41,38 +38,42 @@ public class BlockchainFacadeImpl implements BlockchainFacade {
     }
 
     @Override
-    public void handleBlock(BlockDto blockDto) {
+    public ChainDto getChain() {
+        List<Block> chain = blockchainService.getChain();
+        return new ChainDto(peerService.getMeta(), chain) ;
+    }
+
+    @Override
+    public synchronized void handleBlock(BlockDto blockDto) {
         log.debug("received block: " + blockDto);
-        Peer sender = new Peer(blockDto.getMeta().getSenderAddress());
+        peerService.addPeers(List.of(new Peer(blockDto.getMeta().getSenderAddress())));
 
         Block block = blockDto.getBlock();
         if (blockchainService.isValidBlock(block) && !blockchainService.isContains(block)) {
             blockchainService.addBlock(block);
             peerService.broadcastBlock(block);
         } else {
-            //TODO: resolve conflict
-
+            resolveConflict();
         }
-        peerService.addPeers(List.of(sender));
     }
 
     @Override
-    public void handleTransaction(TransactionDto transactionDto) {
+    public synchronized void handleTransaction(TransactionDto transactionDto) {
         log.debug("received transaction: " + transactionDto);
-        Peer sender = new Peer(transactionDto.getMeta().getSenderAddress());
+        peerService.addPeers(List.of(new Peer(transactionDto.getMeta().getSenderAddress())));
 
         Transaction transaction = transactionDto.getTransaction();
         if (transactionService.isValidTransaction(transaction) && !transactionService.isContains(transaction)) {
             transactionService.addTransaction(transaction);
             peerService.broadcastTransaction(transaction);
         }
-        peerService.addPeers(List.of(sender));
     }
 
     @Override
-    public void handlePing(PingDto pingDto) {
+    public synchronized void handlePing(PingDto pingDto) {
         log.debug("received ping: " + pingDto);
         Peer sender = new Peer(pingDto.getMeta().getSenderAddress());
+        peerService.addPeers(List.of(sender));
 
         peerService.sharePeersWith(sender);
 
@@ -83,13 +84,13 @@ public class BlockchainFacadeImpl implements BlockchainFacade {
                 peerService.sendBlock(sender, myChain.get(i));
             }
         }
-        peerService.addPeers(List.of(sender));
     }
 
     @Override
-    public void handlePeerList(PeerListDto peerListDto) {
+    public synchronized void handlePeerList(PeerListDto peerListDto) {
         log.debug("received list of peers: " + peerListDto);
         Peer sender = new Peer(peerListDto.getMeta().getSenderAddress());
+        peerService.addPeers(List.of(sender));
 
         List<Peer> peers = peerListDto.getPeerList().stream().map(Peer::new).collect(Collectors.toList());
         int chainLength = blockchainService.getChain().size();
@@ -98,7 +99,6 @@ public class BlockchainFacadeImpl implements BlockchainFacade {
                 peerService.sendPing(peer, chainLength);
         }
         peerService.addPeers(peers);
-        peerService.addPeers(List.of(sender));
     }
 
     @Override
@@ -114,6 +114,23 @@ public class BlockchainFacadeImpl implements BlockchainFacade {
             miningThread.wait();
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void resolveConflict() {
+        int maxLength = blockchainService.getChain().size();
+        List<Block> newChain = null;
+        List<Peer> peers = peerService.getActivePeers();
+        for (Peer peer : peers) {
+            List<Block> otherChain = peerService.getChainFromPeer(peer).getChain();
+            if (maxLength < otherChain.size() && blockchainService.isValidChain(otherChain)) {
+                maxLength =otherChain.size();
+                newChain = otherChain;
+            }
+        }
+        if (newChain != null) {
+            blockchainService.setChain(newChain);
+            log.debug("Conflict resolved");
         }
     }
 }

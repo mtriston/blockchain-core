@@ -1,5 +1,7 @@
 package com.example.dchat.service;
 
+import com.example.dchat.dto.ChainDto;
+import com.example.dchat.dto.MetaDto;
 import com.example.dchat.model.Block;
 import com.example.dchat.model.Peer;
 import com.example.dchat.model.Transaction;
@@ -15,4 +17,7 @@ public interface PeerService {
     void sendTransaction(Peer peer, Transaction transaction);
     void sendPing(Peer peer, int chainLength);
     void sharePeersWith(Peer recipient);
+    List<Peer> getActivePeers();
+    ChainDto getChainFromPeer(Peer peer);
+    MetaDto getMeta();
 }

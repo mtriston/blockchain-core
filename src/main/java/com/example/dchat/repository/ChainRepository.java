@@ -7,7 +7,7 @@ import java.util.List;
 public interface ChainRepository {
 
     void saveBlock(Block block);
-    void replaceChain(List<Block> chain);
+    void setChain(List<Block> chain);
     Block getLastBlock();
     List<Block> getChain();
     boolean isContains(Block block);

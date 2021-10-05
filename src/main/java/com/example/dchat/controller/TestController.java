@@ -30,13 +30,8 @@ public class TestController {
         return new ArrayList<>(transactionRepository.getTransactions());
     }
 
-    @GetMapping("/chain")
-    List<Block> getChain() {
-        return new ArrayList<>(blockchainService.getChain());
-    }
-
     @GetMapping("/peer") // peers?
     List<Peer> getPeer() {
-        return new ArrayList<>(peerRepository.getActivePeers());
+        return peerRepository.getPeers();
     }
 }

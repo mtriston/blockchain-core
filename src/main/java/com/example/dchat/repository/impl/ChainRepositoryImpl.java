@@ -23,7 +23,7 @@ public class ChainRepositoryImpl implements ChainRepository {
     }
 
     @Override
-    public void replaceChain(List<Block> chain) {
+    public void setChain(List<Block> chain) {
         blockchain.clear();
         blockchain.addAll(chain);
     }

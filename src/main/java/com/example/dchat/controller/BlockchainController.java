@@ -1,12 +1,10 @@
 package com.example.dchat.controller;
 
-import com.example.dchat.dto.BlockDto;
-import com.example.dchat.dto.PeerListDto;
-import com.example.dchat.dto.PingDto;
-import com.example.dchat.dto.TransactionDto;
+import com.example.dchat.dto.*;
 import com.example.dchat.service.BlockchainFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,5 +37,10 @@ public class BlockchainController {
     public String postPing(@RequestBody PingDto pingDto) {
         blockchainFacade.handlePing(pingDto);
         return "Ping are received";
+    }
+
+    @GetMapping("/chain")
+    ChainDto getChain() {
+        return blockchainFacade.getChain();
     }
 }
