@@ -26,8 +26,13 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public boolean isValidTransaction(Transaction transaction) {
-        return cryptographyService.verifyDigitalSignature(transaction.getMessage(), transaction.getSender()) != null &&
-                transaction.getAmount() >= 0 && transaction.getFee() >= 0;
+        try {
+            return cryptographyService.verifyDigitalSignature(transaction.getMessage(), transaction.getSender()) != null &&
+                    transaction.getAmount() >= 0 && transaction.getFee() >= 0;
+        } catch (Exception e) {
+            log.info("Fake transaction or invalid key: " + transaction);
+            return false;
+        }
     }
 
     @Override

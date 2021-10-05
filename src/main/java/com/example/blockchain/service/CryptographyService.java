@@ -112,20 +112,12 @@ public class CryptographyService {
         return java.util.Base64.getEncoder().encodeToString(signedMsgBytes);
     }
 
-    @SneakyThrows
-    public String verifyDigitalSignature(String msg, String senderPublicKeyString) {
+    public String verifyDigitalSignature(String msg, String senderPublicKeyString) throws Exception {
         Cipher decryptCipher = Cipher.getInstance("RSA");
         PublicKey senderPublicKey = stringToPublicKey(senderPublicKeyString);
         decryptCipher.init(Cipher.DECRYPT_MODE, senderPublicKey);
         byte[] encryptedMsgBytes = java.util.Base64.getDecoder().decode(msg);
-        try {
-            byte[] decryptedMsgBytes = decryptCipher.doFinal(encryptedMsgBytes);
-            return new String(decryptedMsgBytes, StandardCharsets.UTF_8);
-        }
-        catch (IllegalBlockSizeException | BadPaddingException e) {
-            log.info("Digital signature is not valid");
-            return null;
-            //todo: пробросить свое исключение
-        }
+        byte[] decryptedMsgBytes = decryptCipher.doFinal(encryptedMsgBytes);
+        return new String(decryptedMsgBytes, StandardCharsets.UTF_8);
     }
 }
