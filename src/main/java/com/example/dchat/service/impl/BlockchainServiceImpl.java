@@ -4,6 +4,7 @@ import com.example.dchat.model.Block;
 import com.example.dchat.model.Transaction;
 import com.example.dchat.repository.ChainRepository;
 import com.example.dchat.service.BlockchainService;
+import com.example.dchat.service.PeerService;
 import com.example.dchat.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -26,6 +27,7 @@ public class BlockchainServiceImpl implements BlockchainService {
 
     private final ChainRepository chainRepository;
     private final TransactionService transactionService;
+    private final PeerService peerService;
 
     @PostConstruct
     private void runMining() {
@@ -80,5 +82,6 @@ public class BlockchainServiceImpl implements BlockchainService {
         } while (!isValidBlock(block));
         log.debug("Created new block: " + block);
         addBlock(block);
+        peerService.broadcastBlock(block);
     }
 }

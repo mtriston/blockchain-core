@@ -1,10 +1,12 @@
 package com.example.dchat.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Value;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Value
+@Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class PingDto {
     MetaDto meta;
     int chainHeight;

@@ -33,6 +33,15 @@ public class Block {
         this.hash = calculateBlockHash(this);
     }
 
+    public Block(int index, String previousHash, List<Transaction> transactions, long timeStamp, int nonce) {
+        this.index = index;
+        this.previousHash = previousHash;
+        this.transactions = transactions;
+        this.timeStamp = timeStamp;
+        this.nonce = nonce;
+        this.hash = calculateBlockHash(this);
+    }
+
     public static String calculateBlockHash(Block block) {
         String dataToHash = block.previousHash
                 + block.index

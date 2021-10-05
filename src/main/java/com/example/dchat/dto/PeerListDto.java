@@ -1,12 +1,14 @@
 package com.example.dchat.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Value;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@Value
+@Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class PeerListDto {
     MetaDto meta;
     List<String> peerList;

@@ -14,7 +14,7 @@ public class ChainRepositoryImpl implements ChainRepository {
     private final List<Block> blockchain = Collections.synchronizedList(new ArrayList<>());
 
     ChainRepositoryImpl() {
-        blockchain.add(new Block(0, null, null));
+        blockchain.add(new Block(0, null, null, 0, 0));
     }
 
     @Override
