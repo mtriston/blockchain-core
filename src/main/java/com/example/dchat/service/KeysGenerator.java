@@ -5,13 +5,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.*;
 
+
 public class KeysGenerator {
 
+    public static final String SSH_DIR = System.getProperty("user.home") + "/.ssh/secrets/";
     private final KeyPairGenerator keyGen;
     private PrivateKey privateKey;
     private PublicKey publicKey;
 
-    public KeysGenerator(int keyLength) throws NoSuchAlgorithmException, NoSuchProviderException {
+    public KeysGenerator(int keyLength) throws NoSuchAlgorithmException {
         this.keyGen = KeyPairGenerator.getInstance("RSA");
         this.keyGen.initialize(keyLength);
     }
@@ -48,8 +50,23 @@ public class KeysGenerator {
     public void generateKeyPair() {
         try {
             createKeys();
-            writeToFile("secrets/public.key", getPublicKey().getEncoded(), false);
-            writeToFile("secrets/private.key", getPrivateKey().getEncoded(), true);
+            writeToFile(SSH_DIR + "public.key", getPublicKey().getEncoded(), false);
+            writeToFile(SSH_DIR + "private.key", getPrivateKey().getEncoded(), true);
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    public void updateKeyPair() {
+        File sshDir = new File(SSH_DIR);
+
+        for (File f : sshDir.listFiles()) {
+            f.delete();
+        }
+        try {
+            createKeys();
+            writeToFile(SSH_DIR + "public.key", getPublicKey().getEncoded(), false);
+            writeToFile(SSH_DIR + "private.key", getPrivateKey().getEncoded(), true);
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }

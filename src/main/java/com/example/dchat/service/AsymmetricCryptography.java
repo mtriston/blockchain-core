@@ -1,20 +1,21 @@
 package com.example.dchat.service;
 
+import lombok.extern.log4j.Log4j2;
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.*;
 import java.security.spec.EncodedKeySpec;
-import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
+@Log4j2
 public class AsymmetricCryptography {
 
     private static final String PATH_TO_PRIVATE_KEY = "secrets/private.key";
@@ -62,30 +63,59 @@ public class AsymmetricCryptography {
 
     public static String getStringKeyFromFile(String filepath) throws IOException {
         byte[] keyBytes = Files.readAllBytes(new File(filepath).toPath());
-        return java.util.Base64.getEncoder().encodeToString(keyBytes);
+        String recipientPublicKey = java.util.Base64.getEncoder().encodeToString(keyBytes);
+        return recipientPublicKey;
     }
 
     public String encryptMsg(String msg, String recipientPublicKeyString) throws Exception {
-
         Cipher encryptCipher = Cipher.getInstance("RSA");
         PublicKey recipientPublicKey = stringToPublicKey(recipientPublicKeyString);
-
         encryptCipher.init(Cipher.ENCRYPT_MODE, recipientPublicKey);
         byte[] msgBytes = msg.getBytes(StandardCharsets.UTF_8);
         byte[] encryptedMsgBytes = encryptCipher.doFinal(msgBytes);
-        return java.util.Base64.getEncoder().encodeToString(encryptedMsgBytes);
+        String encryptedMsg = java.util.Base64.getEncoder().encodeToString(encryptedMsgBytes);
+        return encryptedMsg;
     }
 
-    public String decryptMsg(String msg, String key) throws InvalidKeyException, UnsupportedEncodingException,
-            IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, InvalidKeySpecException,
+    public String decryptMsg(String msg) throws InvalidKeyException, NoSuchAlgorithmException,
             NoSuchPaddingException {
-
         Cipher decryptCipher = Cipher.getInstance("RSA");
-
         decryptCipher.init(Cipher.DECRYPT_MODE, this.privateKey);
         byte[] encryptedMsgBytes = java.util.Base64.getDecoder().decode(msg);
-        byte[] decryptedMsgBytes = decryptCipher.doFinal(encryptedMsgBytes);
-        String decryptedMsg = new String(decryptedMsgBytes, StandardCharsets.UTF_8);
-        return decryptedMsg;
+        try {
+            byte[] decryptedMsgBytes = decryptCipher.doFinal(encryptedMsgBytes);
+            String decryptedMsg = new String(decryptedMsgBytes, StandardCharsets.UTF_8);
+            return decryptedMsg;
+        }
+        catch (IllegalBlockSizeException | BadPaddingException e) {
+            log.info("Message decryption failed");
+            return null;
+        }
+    }
+
+    public String signMsg(String msg) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
+            IllegalBlockSizeException, BadPaddingException {
+        Cipher encryptCipher = Cipher.getInstance("RSA");
+        encryptCipher.init(Cipher.ENCRYPT_MODE, this.privateKey);
+        byte[] msgBytes = msg.getBytes(StandardCharsets.UTF_8);
+        byte[] signedMsgBytes = encryptCipher.doFinal(msgBytes);
+        String signedMsg = java.util.Base64.getEncoder().encodeToString(signedMsgBytes);
+        return signedMsg;
+    }
+
+    public String verifyDigitalSignature(String msg, String senderPublicKeyString) throws Exception {
+        Cipher decryptCipher = Cipher.getInstance("RSA");
+        PublicKey senderPublicKey = stringToPublicKey(senderPublicKeyString);
+        decryptCipher.init(Cipher.DECRYPT_MODE, senderPublicKey);
+        byte[] encryptedMsgBytes = java.util.Base64.getDecoder().decode(msg);
+        try {
+            byte[] decryptedMsgBytes = decryptCipher.doFinal(encryptedMsgBytes);
+            String decryptedMsg = new String(decryptedMsgBytes, StandardCharsets.UTF_8);
+            return decryptedMsg;
+        }
+        catch (IllegalBlockSizeException | BadPaddingException e) {
+            log.info("Digital signature is not valid");
+            return null;
+        }
     }
 }
