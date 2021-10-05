@@ -9,12 +9,12 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.example</groupId>
-    <artifactId>dchat</artifactId>
+    <artifactId>blockchain</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>dchat</name>
-    <description>dchat</description>
+    <name>blockchain</name>
+    <description>blockchain</description>
     <properties>
-        <java.version>11</java.version>
+        <java.version>17</java.version>
     </properties>
     <dependencies>
         <dependency>
@@ -50,6 +50,16 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>2.5.4</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>exec</classifier>
+                        </configuration>
+                    </execution>
+                </executions>
                 <configuration>
                     <excludes>
                         <exclude>
