@@ -1,5 +1,8 @@
 package com.example.blockchain.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Value;
 import lombok.extern.java.Log;
 
@@ -11,7 +14,9 @@ import java.util.Random;
 import java.util.logging.Level;
 
 @Log
-@Value
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Block {
     int index;
     String previousHash;

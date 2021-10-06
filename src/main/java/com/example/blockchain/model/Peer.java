@@ -1,14 +1,13 @@
 package com.example.blockchain.model;
 
-import lombok.AllArgsConstructor;
-import lombok.NonNull;
-import lombok.Value;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-@Value
+@Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class Peer {
     // private String login; // may be this will be some kind of registration. And how the fuck will you know the sender else?
     // If we have dchat -> so the point is -> it should store every word of every person. (changeless history)

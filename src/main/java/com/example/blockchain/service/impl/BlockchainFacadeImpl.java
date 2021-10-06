@@ -98,8 +98,10 @@ public class BlockchainFacadeImpl implements BlockchainFacade {
         List<Peer> peers = peerListDto.getPeerList().stream().map(Peer::new).collect(Collectors.toList());
         int chainLength = blockchainService.getChain().size();
         for (Peer peer : peers) {
-            if (!peerService.isContains(peer))
+            if (!peerService.isContains(peer)) {
                 peerService.sendPing(peer, chainLength);
+                peerService.sharePeersWith(peer);
+            }
         }
         peerService.addPeers(peers);
     }

@@ -1,10 +1,10 @@
 package com.example.blockchain.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Value;
+import lombok.*;
 
-@Value
+@Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class Transaction { // why fields are package-private but not private?
     // private String senderLogin; // to print message like: [spivak] Hello, bitches!
     // private boolean isPrivate; // if true -> it is for msgs for exact person (only recipient will see it)
